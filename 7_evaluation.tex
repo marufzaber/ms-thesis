@@ -1,0 +1,161 @@
+\chapter{Evaluation}
+\label{sec:evaluation}
+In this chapter, we discuss the evaluation of TLDR. Regression test selection tools are primarily evaluated based on their precision and efficiency~\cite{ekstazi, hyrts, starts, faulttracer}. We evaluated TLDR in terms of the number of selected tests (precision) and end-to-end testing time (efficiency). As mentioned earlier, the baseline RTS techniques of our evaluation are Ekstazi, STARTS, and HyRTS. Before discussing the findings of our evaluation, we discuss our research questions, the projects that serve as subjects for our experiments, and the experiment setup. 
+
+\section{Research Questions}
+For our evaluation, we answer the following two research questions:  
+\begin{enumerate}[leftmargin=2mm,itemindent=.5cm,labelwidth=\itemindent,align=left,noitemsep,topsep=0pt]
+	\item \textbf{RQ1: To what extent does TLDR reduce the number of tests selected for re-execution compared to the baseline RTS techniques?}
+	
+	As demonstrated in the previous section, TDLR is safe for all changes in source files that do not involve reflection, similar to state-of-the-art approaches \cite{starts,ekstazi}. However, one of TLDR's goals is to maintain precision, i.e., select as few tests as possible for re-execution while still identifying all possible faults that the original test suite can reveal. We assess TLDR's ability to reduce tests selected while maintaining safety for this research question in contrast to the baselines.
+	
+	\item \textbf{RQ2: What is the end-to-end testing time of TLDR as compared to retest-all, and the baseline RTS techniques?}
+	
+	One major contribution of TLDR is to significantly reduce end-to-end testing time compared to the state-of-the-art techniques, i.e., Ekstazi, STARTS, HyRTS, re-running all the tests from the original test suite, i.e., retest-all, and re-running all the tests from the original test suite with parallelization. As a result, we evaluate each of these six techniques in terms of end-to-end testing time for our experiments.
+\end{enumerate}
+
+\section{Data Collection }
+
+\begin{table}[htb]
+\centering
+  \caption{Meta-information of the study projects}
+  \label{projectmeta}
+  \resizebox{0.8\columnwidth}{!}{%
+    \begin{tabular}{|l|r|r|r|r|r|}
+        \hline
+    {\textbf{Project}} & \textbf{\#Class} & \textbf{SLOC}  & \textbf{\#Tests} & \textbf{\#Commit } & \textbf{\#Star} \\
+    \hline
+    Asterisk-java &  839  & 111721 &   260   & 2004  & 340 \\
+    Commons-dbutils &  96  & 14836  &  307    &  783 & 272 \\
+    Commons-jxpath &  232  & 40128  &    386 &   601 & 150 \\
+    Commons-validator &  150  & 33880 &  544   &   1543 & 127 \\
+    Compile-testing &   49 &  10389 &   221  &   354 & 570 \\
+    Invokebinder &  26  & 7878 &  99  &     163 & 95 \\
+    Chronicle-Map &  453  & 59294 &   1036   &  2935 & 2200 \\
+    Retrofit &  283  &  36610 &  694 &    1865  & 37900\\
+    Logstash-encoder &  227  & 26682 &   320   &   829 & 1800 \\
+    Jfreechart &   1022 & 283820 &  3182   &  4179 & 683 \\
+    Commons Collections & 856   & 62858 &  2884  & 3094  & 347 \\
+    Commons IO & 321   & 26882   & 1468  & 2158  & 574 \\
+    Chronicle Map &     424  & 28697        &    665   & 2492  & 1648 \\
+    Commons Cli & 58   & 12326   & 310  & 915  & 144 \\
+    Joda Time & 530   & 86184   & 5332  & 2104  & 4036 \\
+    Commons Email & 47   & 12474   & 209  & 839  & 60 \\
+    Commons Fileupload &  64  & 10385   & 113  & 954  & 104 \\
+    Commons Lang & 714   & 74934   & 3749  & 5434  & 1628 \\
+    Commons Math & 1941  & 174505  & 6065  & 6402  & 263 \\
+    Commons Pool & 179   & 14337   & 570   & 1908  & 245 \\
+    
+    \hline
+    \end{tabular}%
+    }
+\end{table}%
+
+We selected 20 open-source Java projects from GitHub to evaluate TLDR against the baselines. These projects were either single or multi-modular. These projects were used in the evaluation of prior RTS techniques~\cite{gligoric2015ekstazi,hyrts,starts,legunsen2016extensive}. TLDR's implementation supports Maven and JUnit 4.x but not other build automation tools or unit-testing frameworks. As a result, we excluded projects that had the following characteristics - 
+
+(1) use Gradle, Ant, or other build tools and testing frameworks other than JUnit 4.x, 
+
+(2) have test suites that could not be executed by either Ekstazi, STARTS, HyRTS, or TLDR. For example, running the test suite of \textit{Guava} caused our Java Virtual Machine to crash even after setting up the maximum heap size possible in our machine. While all large projects can be benefited from RTS tools, we excluded these projects due to resource and implementation limitations. Some projects had external environment dependencies, for example, database server, socket connection, etc. Therefore, those projects could not be run without externally setting up environment dependencies. For example, in order to execute the test suite of Apache Common Net, a WebSocket connection between two machines is needed to be established. 
+
+(3) are active and popular. Projects' activity and liveliness are measured by the number of commits and popularity is measured by the number of stars. We excluded projects that had less than 500 commits and less than 50 stars. 
+
+These project exclusion criteria enable a fairer and accurate comparison among the RTS techniques in our evaluation.
+
+Table~\ref{projectmeta} shows the list of projects; project size in terms of number of classes, and source lines of code (SLOC); test-suite size in terms of number of test methods; and project metadata, i.e., number of commits and the number of stars in the latest commit from GitHub using~\textit{Sourcerer}~\cite{linstead2009sourcerer}, a static code analysis infrastructure. 
+
+\section{Experiment Setup}
+
+\begin{table}[htbp!]
+\centering
+\caption{Projects and Sampled Commits }
+\label{hashcodes}
+\resizebox{0.8\textwidth}{!}{
+\begin{tabular}{|l|l|}
+\hline
+\textbf{Project Name} & \textbf{Commit Hash}\\
+\hline
+
+Asterisk-java &
+44aee1b44afbb1e4dc518ad8ea32126291318c32 \\
+Commons-cli &
+De5f2b46fa952a69a8819b60d60a03eac1154282 \\
+Commons-collections &
+Fa11e5702bafb392b20633a0e8c9617cab9a0276 \\
+Commons-dbutils &
+2ed6a127bd830adbe2b385d9ee62ead2f0e61fc5 \\
+Commons-email &
+77ac7bcd01f558eaeeecf50e478e939d74293942\\
+Commons-fileupload &
+f4cab5702b6e7d6c019c9fec29357ad2b552783d\\
+Commons-functor &
+049e4fbdd987a405f2fcc1b97e6c7903db068965\\
+Commons-jxpath &
+07b898f72113be256ecc1420f5388261d951c547\\
+Commons-math &
+b95a43fa9af718899d03bbc2c10587c069c707f0\\
+Commons-pool &
+c9f61e36b119a824c6c02ee6009eddae47bfecef\\
+Commons-validator &
+dcf935a9ef9909e59f631ecbda6d00e2a8ac8450\\
+Compile-testing &
+7e2b01560666ba10b330f1984fdbb3251f2548a1\\
+Invokebinder &
+d539764d7ebb26edc5080a2ecd642d483bcb6030\\
+Chronicle-Map &
+857f544a26e21e169280089b5f8d24b3b880782f\\
+Retrofit &
+bf9f11430de52b13f2f3f1aa2be4b64d6471a46d\\
+Commons-lang &
+efbfd2de9765bc01e4916b16e8eb82370f25ff82\\
+Commons-io &
+724125eff6608884b0ac1c59f62695ecf43e5c8a\\
+Joda-time &
+7b549b1d9ad88be845e469222c57c144ae1b7da1\\
+Logstash-encoder &
+73437e6a3212985eeb55bcb9047c6def74161800\\
+Jfreechart &
+9d7887f00218d39b63f209e86e248f895b10cb87\\
+
+
+\hline
+\end{tabular}
+}
+\end{table}
+
+For each project, we collected hashcodes for the latest 30 commits that compile from the git log of the corresponding projects. The sampled hashcodes are shown in table \ref{hashcodes}. For evaluating the RTS techniques, we installed TLDR, Ekstazi\footnote{collected from ~\textit{https://github.com/gliga/ekstazi}}, STARTS\footnote{collected from ~\textit{https://github.com/TestingResearchIllinois/starts}}, and in our local machine. HyRTS is not open-source. We collected the HyRTS artifact from the authors of the tool~\cite{hyrts}. STARTS had logs of test selection time and test runtime. For Ekstazi and HyRTS, we modified the plugin code to log test selection and run time individually at the end of test selection and test execution phase respectively. It should be noted that we did not modify any existing code, therefore, the core functionalities of these tools remained the same. We implemented a bash script to automatically run the experiment. For each project in our evaluation, the script retrieves the commit in the project's corresponding commit sequence $C'$, using the \texttt{git reset} command and each commit's corresponding hashcode. The script then uses Maven to clean out the project, compile its source code, and compile its test code without running it. Cleaning the project out before compiling it reduces any potential errors arising from residual files remaining in the project’s directories that were produced during previous runs of the project. Some projects had release audit plugin, for example, \textit{Apache Rat} and style formatting plugin, for example, \textit{Maven Checkstyle}. We turned these plugins off because, for some projects, they caused errors while running TLDR as well as the other three RTS plugins. 
+
+For each commit, we ran the test once for each of the six techniques we evaluate, i.e., TLDR, Ekstazi, STARTS, HyRTS, retest-all, and parallel retest-all. To run parallel retest-all, we set \texttt{forkCount} and \texttt{reuseForks} flag of Maven Surefire so that it spawns a specified number of JVM processes concurrently to execute the tests. For our experiment, we used 8 JVM forks to run tests in parallel. Note that, TLDR's test runner also had 8 JVM forks. For each of these runs, we collected the test reports generated by \textit{Maven Surefire}. The generated report is in HTML format. We implemented our own parser to collect the number of tests run from the Surefire HTML reports and test selection and test execution time from the log files generated by our custom code. 
+
+The experiment was conducted using a remote server with 256 GB (1867 MHz) DDR3 RAM, a 112-core \textit{Intel(R) Xenon(R) E5-4650} CPU, Linux 3.10.0 operating system, and 500G of solid-state disk. We used a local server of \textit{Redis 3.2.8} as our in-memory database. 
+
+
+\input{research_q_1.tex}
+
+
+\section{Results}
+
+\subsection{RQ1: Number of Selected Tests}
+
+One of the major goals of RTS techniques is to select as few tests as possible given a change in a software under test, while maintaining safety. To assess TLDR's ability to achieve this goal, we assess TLDR with respect to Ekstazi, STARTS, HyRTS, and retest-all in terms of the number of tests each technique selects. 
+
+Table \ref{table:rq1} shows the number of tests selected by each technique: $Commit$ is the hashcode of the starting commit from which the baselines were evaluated for each project; $\sum Test$ is the total number of tests run for retest-all across all sampled commits; Column (4),(6), (8), and (10) i.e. $\sum Test$ show the total number of tests selected and run by TLDR, STARTS, Ekstazi, and HyRTS respectively; and Column (5), (7), (9), and (11) i.e \textit{\%tests} is the percentage of tests run by each technique across all sampled commits. 
+ 
+Note that sample commits are commits for which the project compiled, at least one of the baseline RTS techniques (i.e., Ekstazi or STARTS) ran, and at least one test was affected by changes in the source code. 
+
+Table \ref{table:rq1}'s two bottom-most rows aggregate results across projects for each RTS technique and retest-all. Row $\sum\sum Test$ (second from the last) of Table \ref{table:rq1} displays the total number of tests run by each technique across the projects in our experiment for which a technique can successfully run, 19 projects for HyRTS and 20 projects for the remaining RTS techniques and retest-all. For \textit{commons-io}, HyRTS was not able to run since it threw a Maven-based exception that remains unresolved at the time of this thesis' submission. The last row of Table \ref{table:rq1} displays the percentage ratio of $\sum\sum Test$ for each tool to $\sum \sum Test$ for retest-all. We can see that TLDR, STARTS, Ekstazi, and HyRTS ran 8.5\%, 23.1\%, 18.5\%, and 12.2\% of all tests across all samples for which the tools ran.  TLDR is the most precise RTS tool compared to Ekstazi, HyRTS, and STARTS. STARTS is the least precise tool. This result is intuitive because STARTS is a static and class-level RTS. For \textit{commons-email}, TLDR was less precise than HyRTS. This occurs whenever a method is (1) overridden by many other subclasses of that method's owner class and (2) those subclasses change to a large degree. This case occurs very rarely. Note that TLDR is always more precise than STARTS and Ekstazi.
+
+\subsection{RQ2: End-to-End Testing Time } 
+
+Table \ref{table:rq2} shows the end-to-end testing time of each technique: $\sum {T}_{all}$ shows the total time across all sample commits in seconds ([s]) for each RTS technique for retest-all; $\sum {T}_{par}$ shows the total time across all sample commits in seconds ([s]) for each RTS technique for parallel retest-all; Column (4), (7), (10), (13) i.e. $\sum {T}_{s}$ show total test selection time across all commits for TLDR, STARTS, Ekstazi, and HyRTS respectively; Column (5), (8), (11), (14) i.e. $\sum {T}_{t}$ show total test execution time across all commits for TLDR, STARTS, Ekstazi, and HyRTS respectively; Column (6), (9), (12), (15) i.e. $\sum {T}_{e}$ show total end-to-end test time across all commits for TLDR, STARTS, Ekstazi, and HyRTS respectively. It should be noted that $\sum {T}_{e}$ is derived by adding $\sum {T}_{s}$ with $\sum {T}_{t}$.
+
+Table \ref{table:rq2}'s four bottom-most rows aggregate testing time results across projects for each RTS technique, retest-all, and parallel retest-all. Similar to Table \ref{table:rq1}, we exclude \textit{Commond-IO} from any average and summation calculation for HyRTS, which could not run on the projects. Row $\sum T[sec]$ shows total test selection, test execution, and end-to-end time across all sample commits in the experiment. Row $\sum T[min]$ and $\sum T[hour]$ display this summation in minutes and hours respectively. The \textit{\%$T_all$} row displays the percentage ratio of $\sum\sum Time$ for each tool to $\sum \sum Time$ for retest-all for all projects. The \textit{\%$T_par$} displays the percentage ratio of $\sum\sum Time$ for each tool to $\sum \sum Time$ for parallel retest-all for all projects. 
+
+\input{research_q_2.tex}
+
+In total, the complete experiment took 23.4 hours to complete. To perform testing of all sampled commits for 20 projects, retest-all took 8.7 hours, parallel retest-all took 6.1 hours, TLDR took 1.6 hours, STARTS took 2.7 hours, Ekstazi took 2.4 hours. HyRTS took 1.9 hours for the 19 test projects it could run on.  
+
+Overall, parallel rest-all, TLDR, STARTS, Ekstazi, and HyRTS takes 70.1\%, 18.3\%, 31\%, 27.5\%, and 21.8\% of the retest-time, respectively. Thus, each tool makes the testing process 29.9\%, 81.7\%, 69\%, 72.5\%, and 78.2\% faster. Therefore, on average, TLDR is faster than STARTS, Ekstazi, HyRTS, and parallel retest-all. Ekstazi is more efficient in test selection. However, due to its coarser granularity, its end-to-end time is more than TLDR. STARTS is the slowest RTS tool among the four RTS techniques under evaluation. 
+
+However, for \textit{logstash-encoder} and \textit{commons-emails}, TLDR is slower than HyRTS. For \textit{commons-emails}, HyRTS is more precise than TLDR due to the aforementioned case. Therefore, for this project TLDR incurs more test execution time, thus, incurs more end-to-end time than HyRTS. For \textit{logstash-encoder}, even though TLDR incurs less test execution time, it incurs more test selection time. Therefore, TLDR incurs more end-to-end time than HyRTS.Overall, TLDR improves upon Ekstazi's end-to-end testing time by a factor of 1.5, STARTS' end-to-end testing time by a factor of 1.7, and HyRTS's end-to-end testing time by a factor of 1.2.
+
+TLDR is never slower than retest-all and parallel retest-all; however, this is not the case for Ekstazi, HyRTS, and STARTS. For example, For \textit{Chronicle Maps}, Ekstazi and HyRTS are slower than parallel retest-all, STARTS is slower than retest-all and parallel retest-all.

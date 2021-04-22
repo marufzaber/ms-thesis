@@ -1,0 +1,240 @@
+% This is a template for Ph.D. dissertations in the UCI format.
+% 
+% All fonts, including those for sub- and superscripts, must be 10
+% points or larger.  Recommended sizes are 14-point for chapter
+% headings, 12-point for the main body of text and figure/table
+% titles, and 10-point for footnotes, sub- and super-scripts, and text
+% in figures and tables.
+%
+% Notes: Add short title to figures, sections, via square brackets,
+% e.g. \section[short]{long}.
+%
+\documentclass[12pt,fleqn]{ucithesis}
+
+% A few common packages
+\usepackage{amsmath}
+\usepackage{amsthm}
+\usepackage{array}
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{relsize}
+\usepackage[titletoc]{appendix}
+\usepackage{todonotes}
+\usepackage{pdflscape}
+
+% Some other useful packages
+\usepackage{caption}
+\usepackage{subcaption}  % \begin{subfigure}...\end{subfigure} within figure
+\usepackage{multirow}
+\usepackage{tabularx}
+\usepackage{verbatim}
+
+% Uncomment the following to attempt to enforce Type 1 or TrueType 
+% fonts. ProQuest does not want the type 3 fonts used by default as
+% of Dec. 2019 - see 
+% https://support.proquest.com/articledetail?id=kA01W000000k9o2SAA . 
+% If you are unable to embed fonts such as 'Zapf Dingbats' or 
+% 'Symbol', try using raster images (.jpg or .png) instead of vector 
+%images (.pdf or .eps).
+% \usepackage[T1]{fontenc} 
+
+% plainpages=false fixes the "duplicate ignored" error with page counters
+% Set pdfborder to 0 0 0 to disable colored borders around PDF hyperlinks
+\usepackage[plainpages=false,pdfborder={0 0 0}]{hyperref}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{microtype}
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+%\captionsetup[table]{textfont=sc,position=top}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{amsmath}
+\usepackage{mathtools}
+\usepackage{listings}
+\usepackage{setspace}
+\usepackage{calc}
+\usepackage{balance}
+\usepackage[htt]{hyphenat}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{booktabs}
+\usepackage{enumitem}
+
+\usepackage{program}
+
+\usepackage[belowskip=0pt,aboveskip=5pt]{subcaption}
+
+\usepackage{amssymb}
+\usepackage{multicol, blindtext}
+\usepackage{algpseudocode}
+\usepackage{xcolor}
+\usepackage{algorithm}
+\usepackage{multicol}
+\usepackage{xcolor}
+\usepackage{etoolbox}
+\definecolor{shadecolor}{RGB}{150,150,150}
+
+
+\usepackage{amsthm}
+\theoremstyle{plain}
+\theoremstyle{definition}
+\theoremstyle{theorem}
+\newtheorem{definition}{Definition}[section]    %% this does it
+\newtheorem{theorem}{Theorem}[section]    %% this does it
+
+\newcommand{\zerodisplayskips}{%
+  \setlength{\abovedisplayskip}{2pt}%
+  \setlength{\belowdisplayskip}{2pt}%
+  \setlength{\abovedisplayshortskip}{0pt}%
+  \setlength{\belowdisplayshortskip}{0pt}}
+\appto{\normalsize}{\zerodisplayskips}
+\appto{\small}{\zerodisplayskips}
+\appto{\footnotesize}{\zerodisplayskips}
+\setlength{\intextsep}{1ex}
+\setlength{\floatsep}{1ex}
+\setlength{\headsep}{1ex}
+\setlength{\textfloatsep}{0.1cm}
+%\setlength{\abovecaptionskip}{1ex}
+%\setlength{\belowcaptionskip}{1ex}
+% eliminate weird spacing to keep top and bottom of page level. I'd
+% rather have uneven bottoms
+\setlength{\parskip}{0pt}
+
+\usepackage{placeins}
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+\definecolor{comments}{rgb}{0,80,0}
+\newcommand{\bhl}[1]{{\color{blue}#1}\xspace}
+
+\newcommand{\com}[1]{{\color{red}{#1}}}
+
+\newcommand{\textred}[1]{\textcolor{red}{#1}}
+\newcommand{\textgreen}[1]{\textcolor{green}{#1}}
+\newcommand{\textblue}[1]{\textcolor{blue}{#1}}
+\ifx\noeditingmarks\undefined
+   \newcommand{\pgrwrapper}[2]{\textred{#1: #2}}
+   \newcommand{\pggwrapper}[2]{\textgreen{#1: #2}}
+   \newcommand{\pgbwrapper}[2]{\textblue{#1: #2}}
+\else
+\fi
+\newcommand{\notejosh}[1]{\pgrwrapper{(Josh}{#1)}}
+\newcommand{\notecrista}[1]{\pggwrapper{Crista}{#1}}
+\newcommand{\notemaruf}[1]{\pgbwrapper{Maruf}{#1}}
+\newcommand{\notejim}[1]{\pggwrapper{Jim}{#1}}
+
+
+% Uncomment the following two lines to use the algorithm package,
+% which provides an algorithm environment similar to figure and table
+% ("\begin{algorithm}...\end{algorithm}"). A list of algorithms will
+% automatically be added in the preliminary pages. Note that you
+% probably want a package for the actual code to go with this (e.g.,
+% algorithmic).
+%\usepackage{algorithm}
+%\renewcommand{\listalgorithmname}{\protect\centering\protect\Large LIST OF ALGORITHMS}
+
+% Uncomment the following line to enable Unicode support. This will allow you
+% to enter non-ASCII characters (such as accented characters) directly without
+% having to use LaTeX's awkward escape syntax (e.g., \'{e})
+% NOTE: You may have to install the ucs.sty package for this to work. See:
+% http://www.unruh.de/DniQ/latex/unicode/
+%\usepackage[utf8x]{inputenc}
+
+% Uncomment the following to avoid "widowing", where page breaks cause
+% single lines of paragraphs to float onto the next page (this is not
+% a UCI requirement but more of an aesthetic choice).
+%\widowpenalty=10000
+%\clubpenalty=10000
+
+% Modify or extend these at will.
+\newtheorem{example}{\textsc{Example}}[chapter]
+
+% Macros for title, author, abstract, etc.
+\input{preliminaries}
+
+% Add PDF document info fields
+\hypersetup{
+	pdftitle={\Thesistitle},
+	pdfauthor={\Authorname},
+	pdfsubject={\Degreefield},
+}
+
+\usepackage{listings}
+\usepackage{color}
+
+\definecolor{dkgreen}{rgb}{0,0.6,0}
+\definecolor{gray}{rgb}{0.5,0.5,0.5}
+\definecolor{mauve}{rgb}{0.58,0,0.82}
+
+\lstset{frame=tb,
+  language=Java,
+  aboveskip=3mm,
+  belowskip=3mm,
+  showstringspaces=false,
+  columns=flexible,
+  basicstyle={\small\ttfamily},
+  numbers=none,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue},
+  commentstyle=\color{dkgreen},
+  stringstyle=\color{mauve},
+  breaklines=true,
+  breakatwhitespace=true,
+  tabsize=3
+}
+
+
+
+
+\begin{document}
+
+% Preliminary pages are always loaded (TOC, CV, etc.)
+\preliminarypages
+
+
+
+\input{1_Intro}
+\input{2_Background}
+\input{3_RelatedWork}
+\input{4_TLDR}
+\input{5_Implement}
+\input{6_Safety}
+\input{7_evaluation}
+\input{9_Threat}
+\input{10_Conclusion}
+
+%\include {Chapter2}
+%\include{chapter2}
+% ... and so on
+
+% These commands fix an odd problem in which the bibliography line
+% of the Table of Contents shows the wrong page number.
+\clearpage
+\phantomsection
+
+% "References should be formatted in style most common in discipline",
+% abbrv is only a suggestion.
+\bibliographystyle{IEEEtran}
+\bibliography{thesis}
+
+% The Thesis Manual says not to include appendix figures and tables in
+% the List of Figures and Tables, respectively, so these commands from
+% the caption package turn it off from this point onwards. If needed,
+% it can be re-enabled later (using list=yes argument).
+\captionsetup[figure]{list=no}
+\captionsetup[table]{list=no}
+
+% If you have an appendix, it should come after the references.
+% \begin{appendices}
+% \include{appendix}
+% \end{appendices}
+
+\end{document}

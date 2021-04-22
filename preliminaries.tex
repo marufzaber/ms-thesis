@@ -1,0 +1,159 @@
+\thesistitle{Towards Parallelization of Regression Test Selection}
+
+%"Dissertation" for PhD, "Thesis" for master's
+\documenttitle{Thesis}
+
+\degreename{Master of Science}
+
+% Use the wording given in the official list of degrees awarded by UCI:
+% http://www.rgs.uci.edu/grad/academic/degrees_offered.htm
+\degreefield{Software Engineering}
+
+% Your name as it appears on official UCI records.
+\authorname{Maruf Hasan Zaber}
+
+% Use the full name of each committee member and full title 
+% (e.g. Professor/Associate Professor).
+\committeechair{ Professor Cristina V. Lopes}
+\othercommitteemembers
+{
+  Associate Professor James A. Jones \\
+  Assistant Professor Joshua Garcia
+}
+
+\degreeyear{2021}
+
+\copyrightdeclaration
+{
+  {\copyright} {\Degreeyear} \Authorname
+}
+
+% If you have previously published parts of your manuscript, you must list the
+% copyright holders; see Section 3.2 of the UCI Thesis and Dissertation Manual.
+% Otherwise, this section may be omitted.
+\prepublishedcopyrightdeclaration
+{
+
+% 	Portion of Chapter 5 {\copyright} 1999 John Wiley \& Sons, Inc. \\
+	 {\copyright} {\Degreeyear} \Authorname
+}
+
+% The dedication page is optional
+% (comment out to exclude).
+% \dedications
+% {
+%   (Optional dedication page)
+  
+%   To ...
+% }
+
+\acknowledgments
+{
+I could not have accomplished this research and thesis without the continuous support and encouragement of many people who are close to me professionally and personally. More precisely, I would like to express my gratitude to my dissertation committee members, colleagues, friends, and family. 
+
+First and foremost, I want to thank my advisor, Professor Cristina Videira Lopes for her valuable guidelines and continuous support. My journey in graduate school has been particularly nuanced and oftentimes, difficult for various professional and personal reasons. Crista always encouraged me to freely pursue projects that I am interested in and make career moves as I deem suitable for me. I think her research insights, engineering acumen, and career guidelines will always help me to be a better engineer. 
+
+I want to thank my thesis committee members, Prof. James A. Jones and Prof. Joshua Garcia for their valuable comments and suggestions. I was a teaching assistant for Prof. Jones for two quarters. I learned a lot about Software Testing, the overarching theme of this very thesis, by working with him in the Software Test & Debug course. Josh was my de-facto co-advisor on this research on regression test selection. This work would not have been possible without his valuable, in-depth, and domain-specific advice. Josh went above and beyond in helping me write papers for ASE and ISSTA. Josh, thank you very much! 
+
+I want to thank my colleagues in the Mondego Lab, ‪Farima FarmahiniFarahani, Vaibhav Saini,Di Wang, Rohan Achar, and Pedro Martins for their insightful questions and intellectual company. I enjoyed so much working with you all and I wish you all great success in your career.  I want to thank the Informatics department manager, Marty Beach, ICS student counselor Julie Oh, Kaelyn Costa, and Leslie Escalante, and international student advisor Ruth Ortega for making my time in the department and in UCI so seamless. 
+
+Big shout out to my friends in UC Irvine, Pedro Matias, Sumaya Almanee, Janus Vermanken, Nil Mamano, Sameera Ghayyur, Efi Karra, Ned Beigi, Evita Bakopolou, Prabhu Rajasekaran, Ke Jing, Ted Grover, Syed Andalib, Wahiduzzaman Khan, and Rufaida Anagh. Thank you for keeping me sane in this long and arduous endeavor. Big thanks to my friends Sakib Malek, Mehrab Morshed, Sakib Sauro, Abdul Mumit, and Prithvi Zareen, Adij  Khan, Habib Tawhid, and Shuvo Mahmud for always being in touch while being so far geographically.  
+
+Big shout out to my family. I am what I am today because of the dream that was instilled in me by Ammu and Abbu. The amount of support, dedication, and courage they have shown in every step of my life is monumental. Ammu and Abbu, you are the champions. Big shout-out to my sisters, Ummul Mahfuza and Ummul Mahmuda. Both of you are my role models and will always remain so.  
+
+Last but not the least, a big shout out to my fiance, Faizaa Fatima for her continuous love and support for my work. She has been an inspiration in my life. Faizaa, keep enlightening me as you always do. 
+}
+
+
+
+% Some custom commands for your list of publications and software.
+\newcommand{\mypubentry}[3]{
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}p{4.5in}r}
+    \textbf{#1} & \textbf{#2} \\ 
+    \multicolumn{2}{@{\extracolsep{\fill}}p{.95\textwidth}}{#3}\vspace{6pt} \\
+  \end{tabular*}
+}
+\newcommand{\mysoftentry}[3]{
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{#1} & \url{#2} \\
+    \multicolumn{2}{@{\extracolsep{\fill}}p{.95\textwidth}}
+    {\emph{#3}}\vspace{-6pt} \\
+  \end{tabular*}
+}
+\begin{comment}
+% Include, at minimum, a listing of your degrees and educational
+% achievements with dates and the school where the degrees were
+% earned. This should include the degree currently being
+% attained. Other than that it's mostly up to you what to include here
+% and how to format it, below is just an example.
+%
+% CV is required for PhD theses, but not Master's
+% comment out to exclude
+\curriculumvitae
+{
+
+\textbf{EDUCATION}
+  
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{Doctor of Philosophy in Computer Science} & \textbf{2012} \\
+    \vspace{6pt}
+    University name & \emph{City, State} \\
+    \textbf{Bachelor of Science in Computational Sciences} & \textbf{2007} \\
+    \vspace{6pt}
+    Another university name & \emph{City, State} \\
+  \end{tabular*}
+
+\vspace{12pt}
+\textbf{RESEARCH EXPERIENCE}
+
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{Graduate Research Assistant} & \textbf{2007--2012} \\
+    \vspace{6pt}
+    University of California, Irvine & \emph{Irvine, California} \\
+  \end{tabular*}
+
+\vspace{12pt}
+\textbf{TEACHING EXPERIENCE}
+
+  \begin{tabular*}{1\textwidth}{@{\extracolsep{\fill}}lr}
+    \textbf{Teaching Assistant} & \textbf{2009--2010} \\
+    \vspace{6pt}
+    University name & \emph{City, State} \\
+  \end{tabular*}
+
+\pagebreak
+
+\textbf{REFEREED JOURNAL PUBLICATIONS}
+
+  \mypubentry{Ground-breaking article}{2012}{Journal name}
+
+\vspace{12pt}
+\textbf{REFEREED CONFERENCE PUBLICATIONS}
+
+  \mypubentry{Awesome paper}{Jun 2011}{Conference name}
+  \mypubentry{Another awesome paper}{Aug 2012}{Conference name}
+
+\vspace{12pt}
+\textbf{SOFTWARE}
+
+  \mysoftentry{Magical tool}{http://your.url.here/}
+  {C++ algorithm that solves TSP in polynomial time.}
+
+}
+
+\end{comment}
+
+% The abstract was previously limited to a maximum of 350 words, 
+% but the UCI manual at https://etd.lib.uci.edu/electronic/td2e#2.2.1.
+% currently does not indicate that there is any word limit for the abstract
+\thesisabstract
+{
+Regression Test Selection (RTS) is a set of techniques for selecting a subset of test cases from the test suite based on the changes in source code. RTS tools may select tests in different granularity, namely file-level, class-level, or method-level. File- and class-level tools are less precise than method-level tools, but they are simpler, and carry considerably less execution overhead in test selection. In this thesis, we show how method-level test selection can be made efficient by appropriate use of inverted indexing and parallel processing. We present a static method-level RTS tool, TLDR -- a Maven plugin for unit testing with JUnit 4.x. Like other static RTS approaches, TLDR extracts the firewall of each changed method or field to compensate for dynamic dispatch. The main difference with other RTS tools is that it has as a configurable and multi-threaded \textit{Pipe and Filter} architecture, with several in-memory inverted indexes for fast lookup. Our evaluation, conducted on 20 popular open-source Java projects has shown that TLDR is both more precise and more efficient than contemporary RTS techniques like Ekstazi, STARTS, and HyRTS.
+
+}
+
+
+%%% Local Variables: ***
+%%% mode: latex ***
+%%% TeX-master: "thesis.tex" ***
+%%% End: ***

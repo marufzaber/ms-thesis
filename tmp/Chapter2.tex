@@ -1,0 +1,67 @@
+
+
+Comparison of an interactive debugger for a single-threaded program with interactive debugger for a distributed system.
+
+A fundamental goal of an interactive debugger is to show state changes to the user. Traditional interactive debuggers for  single-threaded programs show the entire state to the user at each step. The user can inspect the value of any variable , any object attribute.  However, in a distributed context, such an approach is not suitable for two reasons. Firstly, because it is not needed. A user is usually interested in a subset of the state - for example, in a shared state distributed system, it is safe to assume that information about the changes in the shared state would be more interesting to an user instead of changes in a local variable in a node which is not a part of the shared state. Secondly, the notion that the debugger does not have to display the entire state at each step to the user simplifies the implementation portion quite substantially. But now the question becomes how to identify the subset of state to be shown to the user. This depends on the underlying distributed system model. 
+
+
+Breakpoints are a very useful tool in debugging and an interactive debugger needs to support breakpoints. A user can set a predicate and the debugger will stop the execution of the program when that predicate evaluates to true so that the user can inspect the state at that point. For breakpoints to convey useful information to the user in a distributed context, the debugger needs to show the execution path which led to the breakpoint. For a single-threaded program, there is only one execution path which is the sequential execution of the program, so a debugger doesn't need to show the path explicitly. But a distributed system can have multiple possible execution paths and a debugger needs to expose to the user the specific path to the breakpoint. This means that the debugger needs to maintain some sort of history. The debugger needs to log each state change and event so that it can be displayed to the user when the breakpoint evaluates to true.
+
+GOT maintains history in the form of the version graph. So, the debugger does not need to keep track of history itself. When a breakpoint evaluates to true, it can simply display the version graph to the user as a sequential visualization of the state changes and events till that point.
+
+
+In addition to displaying the state changes, an interactive debugger for a distributed system needs to also show the reason for the change in state. So, in addition to showing what changed, an interactive debugger in order to be useful to a programmer needs to also show why did the state change. The answer to why in a single-threaded linear program is obvious - the line of code which was executed just before changed the state. In a distributed context, the answer is not so simple as the state can change due to outside events as well. As discussed in an earlier section, there are three possible ways state can change in a distributed system and an interactive debugger needs to keep track of all three. 
+
+
+There are some distributed system models which are more amenable to interactive debugging than others. For example, it is relatively straightforward to debug an application based on the server-client model where all the clients are communicating with a single server. The debugger can attach itself to the server and keep track of all the requests to the server and responses from the server. Since all the nodes only communicate with the server, it is enough for the debugger to have access to the server logs in order to be able to build a history of state changes. Also, to control the server is to control the flow of execution. In a P2P system, the debugger can not attach itself to any one node but must run as a separate node different from the application nodes. And all the communications need to be routed through the debugger node.
+
+For systems which use replicated types like CRDT or GOT, it is fairly obvious that an user would be primarily interested in tracking the changes in state of the replicated objects and the debugger needs to expose these to the user. In other types of systems, to understand exactly which objects/variables would be of interest to a developer and thus, should be tracked by the debugger requires more thought. 
+
+To identify the properties of a distributed system  which matter the most from the point of view of interactive debugging.
+
+History, Sharing of state, Consistency model, separation of state, read stability
+
+read stability is needed for global stop. Separation of published state from local state is the key?
+
+We discussed the importance of the underlying model or framework while building an interactive debugger for distributed systems. In this section, we analyse some common distributed system models from the point of view of building an interactive debugger for them. We discuss the advantages and disadvantages of each.
+
+If we were to debug an application where a number of clients are reading to and writing from an ACID database. An  ACID database has a structured state  which is the database schema. We can build an interactive debugger using the centralized model where the debugger intercepts all the communication between the nodes and the server. So the debugger can log all the reads and writes being performed on the database objects. The clients would need to send their local states to the debugger.
+
+Actor models don't have an easily identifiable subset of state which the debugger can track. However, they do have read stability inasmuch each actor needs to check its inbox and read the message before processing the message and possibly changing its local state.
+
+CRDT - based models are a shared state model so the debugger would need to track the changes in the shared state. However, they don't have separation of local state from published state.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

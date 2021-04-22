@@ -1,0 +1,39 @@
+\chapter{Limitations and Threats to Validity}
+\label{sec:thread}
+
+There are several conceptual and implementation limitations of TLDR as well as potential threats to the validity of the evaluation of TLDR. In this chapter, we discuss these limitations and threats to the validity.
+
+
+\section{Reflection and Instrumentation}
+
+Reflection is a technique to analyze and modify the behavior of programming construct i.e. statements, methods, classes, and interfaces at runtime~\cite{forman2004java}. Thus dependencies that are injected by reflection can only be parsed in the runtime. Like STARTS and HyRTS, TLDR does not track dependencies resulting from the use of Java reflection API. It should be noted that reflection is not a common phenomenon in Java programs as it is computationally expensive and pose security and privacy threats. To further assess the prevalence of reflection in open-source Java projects, we statically parsed the bytecode of 50 thousand popular and buildable open-source Java projects. These projects were collected from an open-source dataset named 50k-C~\cite{martins201850k}. JDK exposes \textit{java.lang.reflect} package that includes APIs to read or write bytecode in runtime. Before the read/write operations, the corresponding programming construct i.e. class, method, field, etc. are needed to be loaded by a set of API that belong to \textit{java.lang.Class} and \textit{java.lang.Object} package. Therefore, we statically parsed the bytecodes of the projects in 50k-C to find the use of the following APIs - 
+\begin{itemize}
+  \item java.lang.reflect.*
+  \item java.lang.Object.getClass
+  \item java.lang.Class.getMethods
+  \item java.lang.Class.getFields
+  \item java.lang.Class.getMethod
+  \item java.lang.Class.getField
+  \item java.lang.Class.getConstructors
+  \item java.lang.Class.getConstructor
+\end{itemize}
+
+
+In addition to reflection, another way to inject runtime dependency is instrumentation. A java program i.e. Java Agent can utilize JVM's Instrumentation API to edit bytecodes that are already loaded in a JVM~\cite{binder2007advanced}. A Java agent must have two public methods named \textit{premain} and \textit{agetmanin} who are responsible to load the agent itself statically and dynamically respectively. Therefore, we searched for the two mentioned APIs among the study bytecode. 
+
+We found that out of the 50,000 projects, only 4382 (8.7\%)projects had reflection or instrumentation. This result shows that a vast majority of the open-source Java projects do not use reflection. It should be noted that this limitation is not a threat to the validity of our approach, it is simply an implementation shortcoming of TLDR. Reflective dependencies can be added by performing a more sophisticated analysis of the bytecode~\cite{b17}. Since TLDR does not capture dependencies injected by reflection, we did not include any project that has reflection in our evaluation dataset. 
+
+
+\section{External Dependency}
+
+In addition to reflection, we did not incorporate external jars in the dependency extractor. This decision was carried out because we focused primarily on intra-project change impact propagation. Nonetheless, changes in external dependency artifacts may cause unanticipated changes in the project codebase. We plan to add external jar dependency tracking to TLDR.
+
+\section{Anomaly}
+
+By analyzing the generated test reports, we noticed that some of the selected tests fail. This happened for all three tools. However, those tests pass when the complete test suite is run. Unreliable behavior of unit testing has been documented in the literature~\cite{b20,b22}~\cite{palomba2017does}. These tests are known as flaky tests ~\cite{b18}, and some causes for them include concurrency issues, test order dependency, resource leak, time, randomness, etc. Particularly problematic for RTS, in general, are test order dependencies. Although developers are encouraged to follow a set of conventions while writing unit tests, these conventions are not syntactically enforced by the test libraries. Therefore, bad implementations create the above-mentioned issues, thus seriously undermining the outcome of RTS. In TLDR, we consider intra-test dependency -- dependency to static initializer, fields, helper methods, and parameterized tests within the test suite. However, test order dependency is not currently addressed. This limits the applicability of TLDR (and all other RTS tools we are aware of, including Ekstazi, STARTS, and HyRTS) to test suites that follow recommended guidelines for writing unit tests.
+
+\section{Average Error}
+
+Our performance evaluation suffers from the same shortcomings of other similar performance evaluations published in recent RTS literature~\cite{rtsplusplus, starts,ekstazi,faulttracer}. Specifically, the processing of each commit was done only once. We are aware that execution times for the exact same commits vary, depending on many external factors of the machine where the experiment was run. As such, in order to get statistically more reliable time values, we should run each experiment multiple times, and report the average. The reason for not doing that is that these experiments take a long time to complete; repeating them multiple times would severely slow down the reporting of these results, forcing us to reduce either the number of projects in our experimental dataset or the number of commits sampled in each project. The absence of repeated experiments is mitigated by sampling multiple commits, and having a substantially high total experiment time (roughly, 37 hours of compute time). Since the main goal of this study is to compare TLDR with 3 baselines, and given that all experiments were run in the exact same machine, the reported results are statistically valid, at least in comparison to each other.
+
+

@@ -1,0 +1,19 @@
+\chapter{Future Work and Conclusion}
+\section{Future Work}
+Currently, TLDR is compatible with Java projects that use Maven as build system. In chapter 8, we have discussed several implementation and conceptual limitations of the tool. In  the future, we would like to advance our work on regression testing in the following directions - 
+
+\subsection{Ground Truth and Benchmark}
+The baseline for the safety in all RTS tools is that the tools select all the tests that are impacted by the change in the current iteration. The baseline for the precision in all RTS tools is that the tools must select only the tests that are impacted by the change in the current iteration. In order to completely evaluate the absolute safety and precision of TLDR and other RTS tools, i.e. Ekstazi, STARTS, and HyRTS, we need to know the ground truth that is the exact set of tests that are impacted by a given set of changes. Such ground truth can be found by implementing a dynamic and method-level RTS tool which is computationally expensive. In the future, we plan to develop a benchmark that contains the precise set of the tests that must be run for a set of the given change. Such a benchmark can be developed for a set of commits for popular open-source project. 
+
+\subsection{Robust Artifact}
+A robust artifact will enable us to conduct a robust evaluation. Currently, TLDR is a Maven plugin that works for single- and multi-module Maven projects. In the future, we will make the tool compatible with projects that use Ant, Gradle, and Bazel, three of the most popular build systems. Also, external and environment dependencies are not encapsulated within TLDR. For example, running the tool requires running a local redis server. In the future, we plan to make all TLDR-specific and project-specific environment dependencies encapsulated in containers like Docker. These improvements will enable us to evaluate the tool for projects with a wide-range of variety. 
+
+\subsection{External Dependency}
+Currently, TLDR analyzes dependencies within the source-code of the subject projects. However, projects often involve dependencies to external files and resources like database, shared memory, etc. Oftentimes, these dependencies are non-trivial to parse and analyze. For example, projects can have dependency on a file or a database table that is hosted in one or many remote machines. Projects can have dependencies on external files that are owned by different entities with regulated access privileges. In the future, we seek to explore how these external and nuanced dependencies affect regression testing and how to incorporate these dependencies within TLDR. 
+
+\section{Conclusion}
+
+In this thesis, we presented TLDR, a static method-level RTS technique. TLDR selects and runs fewer tests than state-of-the-art RTS approaches Ekstazi, HyRTS, and STARTS because it performs change impact analysis and test selection at the method level. TLDR gains this improved precision of test selection while significantly reducing end-to-end testing time since TLDR leverages parallelism, and efficient checksum algorithm usage and in-memory database-schema design to improve the throughput of the test selection process. We evaluated TLDR for 20 projects. Our evaluation shows that TLDR is 2.7 times more precise than STARTS, 2.1 times more precise than Ekstazi, and 1.4 times more precise than HyRTS, while also being 1.5 times faster than Ekstazi, 1.7 times faster than STARTS, and 1.2 times faster than HyRTS. Overall, our evaluation demonstrates that method-level RTS can be made both precise and efficient. In future work, we aim to make TLDR safe for reflection and external libraries.  
+
+
+

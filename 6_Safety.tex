@@ -1,0 +1,67 @@
+\chapter{Safety of TLDR}
+\label{sec:Implementation}
+
+\section{Safety of TLDR}
+
+An RTS technique is {\em safe} iff it selects all tests that are impacted by a change in the projects' files. As currently implemented, TLDR is not entirely safe, because it does not track dependencies resulting from (a) the use of Java reflection, and (b) the use of external jars. This is not an inherent problem of TLDR; it is simply a limitation of its current implementation, which we plan to improve. TLDR is safe for all other cases, i.e. for {\em all} changes in the {\em source files} of the projects, as long as they don't involve reflection. 
+
+In broad strokes, an RTS technique is safe when (1) it correctly captures all dependencies of all code entities down to the desired level of granularity; (2) it correctly slices the dependency graph for the set of entities that change from a version to another; and (3) it correctly identifies the tests that reach any part of those slices. We use the concept of \textit{Static Extended Dependency Graph} to capture (1), and the concept of \textit{Firewall} to capture (2).
+
+\subsection{Static Extended Dependency Graph}
+
+Zhang et al. presented extended dependency graphs for RTS tools~\cite{b37} in the context of dynamic dependency tracking. Extended dependency graphs model methods and fields as vertices in the graph, and the edges are the dependencies. 
+For a set of methods, $M$ and a set of fields, $F$, extended dependency graph, $G$ in an OO language is defined as follows~\cite{b38}: 
+\begin{definition}
+Dynamic Extended Dependency Graph: $G = <V, E>$ where $ V = M \cup F$ and $E = <v, v'>$ where $v \in M, v' \in \textit{calledBy}(v) \land V$  
+\end{definition}
+In this definition $calledBy(v)$ denotes the set of members (methods or fields) that the method $v$ refers to at runtime. It is worth noting that $G$ is dynamic in nature. This means $G$ has edges that correspond to dependencies among members that are resolved at runtime. 
+For performance purposes, and as explained before, TLDR uses a static dependency graph. Because of dynamic dispatch, static analysis of object-oriented programs needs to take inheritance relations into account. Algorithm~\ref{dependency} describes the construction of the static extended dependency graph. Formally, we define the static extended dependency graph $SG$ as follows:
+
+\begin{definition}
+\label{def:staticextendedcallgraph}
+Static Extended Dependency Graph: 
+\end{definition}
+\noindent
+$SG$ = $(V, E)$ where $ V = M \cup F$, $E$ = $(v, v')$ where $v \in M$, $v' \in V \land (\textit{referencedBy(v)}  \cup (overridden(referencedBy(v)) \lor inherited(referencedBy(v)) ))$  
+
+In the definition, $E$ is the set of edges (dependencies) that are direct or indirect via polymorphism. $referencedBy(w)$ is  the set of members that method $w$ calls or refers to. $overridden(w)$ is the set of all methods that override method $w$, and $inheritedBy(w)$ is the set of methods inherited from superclasses. In Java, all the non-reflective dependencies among members can be captured by the following byte code instructions: \texttt{invokevirtual, invokeinterface, invokestatic, invokespecial, getstatic, getfield, putstatic, putfield}. $SG$ thus, includes all types of dependencies in Java bytecode, except reflective dependencies.  
+
+\subsection{Firewall}
+
+The concept of firewall in software testing was first discussed by White et al.~\cite{white1992firewall} and has since been adopted into object-oriented testing as well~\cite{white2003firewall, white2005utilization, white2008extended, starts, hyrts}. The firewall of a given code entity (i.e. file, class, method, field, or statement) is the set of entities that can be impacted by a change in that entity. Finding the firewall of a changed entity requires traversing transitive dependents of that entity. In a static RTS, such traversal involves traversing both direct and polymorphic edges. Class firewall has been proposed by Legunsen et al. for a static class-level RTS ~\cite{legunsen2016extensive}. A class-level RTS selects all test classes that have dependency on any class in the class firewall of a changed class. Similarly, a method-level RTS selects all test methods that have dependency on any method or field in the method or field firewall of a changed method or field. Formally, the firewall of a member in a static graph, $SG$ can be defined as follows: 
+\begin{definition}\label{def:firewall}
+Firewall: $F(w) = {\bigcup}_{\forall v}{DFS(v, SG)}, w \in M,v \in V \land calledBy(w) $
+\end{definition}
+
+In this definition, $DFS(v,SG)$ returns a set of members that are connected to node $v$ in a static graph $SG$. Definition \ref{def:firewall} defines firewall of a member as the union of firewall of all dependent members. 
+
+\subsection{Proof of Safety of TLDR}
+A safe static method-level RTS tool captures both static and polymorphic dependencies among fields and methods. To prove the safety of TLDR we need to prove that TLDR captures all types of dependency in Java bytecode i.e. creates a static extended dependency graph. Also, we need to prove that it collects all members that may be impacted by a given change in source code. Therefore, to prove the safety of TLDR, we prove that -- (1) TLDR constructs a static extended dependency graph $SG$ (2) TLDR selects all tests that map to $firewall(v)$ where $v$ is a changed entity. 
+
+\begin{theorem}\label{theory}
+TLDR constructs static extended dependency graph $SG$
+\end{theorem}
+\begin{proof}
+Function $DEPEXTRACTION$ is being called for each changed or new $v \in M \cup F$. It takes the dependent entity $v$ and extracts the set of its direct dependencies, $dependency$. Let us consider that $DEPEXTRACTION$ only captures static edges. Line(13) inserts each $member \in dependency$ as $v$'s dependency with which $v$ has \texttt{invokestatic, invokespecial, getstatic, getfield, putfield, putstatic} relation. These are static edges. However, line (22) inserts the overridden and inherited versions of each $member$ with which $v$ has \texttt{invokeinterface, invokevirtual} relations. Since the edges are between the dependent and all the overridden and inherited versions of the dependency members, they are polymorphic edges according to ~\cite{sundaresan2000practical}. Contradiction. 
+
+Therefore, $DEPEXTRACTION$ captures both static and polymorphic edges, thus according to definition \ref{def:staticextendedcallgraph} constructs $SG$.
+\end{proof}
+
+
+
+\begin{theorem}\label{theory}
+TLDR selects all tests $t$ that has either direct or polymorphic dependency to $firewall(v)$ where $v$ is a changed entity. 
+\end{theorem}
+\begin{proof}
+For a changed $v \in M \cup F$, let us assume algorithm \ref{tldr} returns a set of tests $selects$ that does not include one $t$ which has edge to a $v^{'} \in V \cup F$ and $v^{'} \in firewall(v)$. For each new and changed $v$, TLDR calls $DFS(v)$ on $SG$ created by $DEPEXTRACTION$. According to \cite{tarjan1972depth}, $DFS(v)$ returns a set of all entities reachable from $v$ in $SG$. Therefore, $DFS(v)$ returns $firewall(v)$. This set is included in $goldset$. Line (25) adds each $t$ that maps to any $v^{'} \in goldset$ in $mapped$. Each $t$ in $mapped$ is impacted by change in source code. Line (28), then calls $DFS(t)$ for each $t$ in mapped to collect all $t'$ that is impacted by $t$ and adds them to $select$.  Contradiction. Therefore, $select$ includes all test methods that map to $firewall(v)$ for each changed entity $v$.
+
+\end{proof}
+
+%Therefore, the technique used in TLDR is safe. 
+
+
+
+
+
+
+
